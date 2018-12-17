@@ -1,6 +1,0 @@
-[submodule "builder"]
-	path = builder
-	url = https://github.com/ZenosCaveSoftware/dot-proj-builder.git
-[submodule "api"]
-	path = api
-	url = https://github.com/ZenosCaveSoftware/dot-proj-api.git
