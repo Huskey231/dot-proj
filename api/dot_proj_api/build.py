@@ -4,12 +4,17 @@ import json
 import base64
 import sys
 import os
-from docker.errors import ContainerError
-from flask import Flask, jsonify, request
 
-app = Flask(__name__)
+from docker.errors import ContainerError
+from flask import (
+    Blueprint, request, jsonify
+)
+
 client = docker.from_env()
 api = docker.APIClient()
+
+
+bp = Blueprint('build', __name__, url_prefix='/build')
 
 
 def run(file):
@@ -30,12 +35,7 @@ def run(file):
     return client.containers.get(container.get('Id'))
 
 
-@app.route('/')
-def index():
-    return jsonify({}), 200
-
-
-@app.route('/build', methods=["POST"])
+@bp.route('/', methods=["POST"])
 def build():
     print(request.json)
     container = None
@@ -55,7 +55,7 @@ def build():
 
             return jsonify({'response': response.decode()}), 200
         else:
-            print(container.logs().decode(), '!!!!', file=sys.stderr)
+            print(container.logs().decode(), file=sys.stderr)
             return '{}', 400
 
     except ContainerError as err:
