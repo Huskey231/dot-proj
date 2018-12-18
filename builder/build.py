@@ -45,7 +45,7 @@ def make_build(source_directory):
 
 def make_dist(request, build_directory):
     distribution = io.BytesIO()
-    with zipfile.ZipFile(distribution, 'w'term) as zip_ref:
+    with zipfile.ZipFile(distribution, 'w') as zip_ref:
         for pattern in request['dist']:
             path_pattern = os.path.join(build_directory, pattern)
             for file in glob.glob(path_pattern):
