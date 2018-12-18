@@ -1,6 +1,6 @@
 import os
 import shlex
-import tarfile
+import zipfile
 import tempfile
 import io
 import base64
@@ -16,9 +16,8 @@ def make(data):
     file_bytes = base64.b64decode(data)
     file = io.BytesIO(file_bytes)
     with source as temp_dir:
-        with tarfile.open(fileobj=file, mode='r:*') as tar:
-            members = tar.getmembers()
-            tar.extractall(temp_dir, members)
+        with zipfile.ZipFile(file) as zip_ref:
+            zip_ref.extractall(temp_dir)
 
         return make_build(temp_dir)
 
@@ -46,17 +45,12 @@ def make_build(source_directory):
 
 def make_dist(request, build_directory):
     distribution = io.BytesIO()
-    with tarfile.open(fileobj=distribution, mode="w:gz") as tar:
+    with zipfile.ZipFile(distribution, 'w'term) as zip_ref:
         for pattern in request['dist']:
             path_pattern = os.path.join(build_directory, pattern)
             for file in glob.glob(path_pattern):
                 path = os.path.relpath(file, build_directory)
-                with open(file, 'rb') as fd:
-                    info = tarfile.TarInfo(path)
-                    fd.seek(0, io.SEEK_END)
-                    info.size = fd.tell()
-                    fd.seek(0, io.SEEK_SET)
-                    tar.addfile(info, fd)
+                zip_ref.write(file, arcname=path, compress_type=zipfile.ZIP_DEFLATED)
 
     dist_bytes = distribution.getvalue()
     return base64.b64encode(dist_bytes).decode('utf-8')
@@ -64,7 +58,4 @@ def make_dist(request, build_directory):
 
 if __name__ == '__main__':
     env = os.environ.get('DOT_PROJ_BUILD', '')
-    try:
-        print(make(env))
-    except:
-        print(env)
+    print(make(env))
