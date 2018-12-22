@@ -6,24 +6,24 @@ with io.open('README.rst', 'rt', encoding='utf8') as f:
     readme = f.read()
 
 setup(
-    name='dotProj_api',
+    name='dotProj_builder',
     version='0.1.0',
     license='MIT',
     maintainer='Luke Smith',
     maintainer_email='lsmith@zenoscave.com',
-    description='Flask API for dotProj ',
+    description='Build engine for dotProj',
     long_description=readme,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=[
-        'flask',
-        'docker',
-    ],
+    install_requires=[],
     extras_require={
         'test': [
             'pytest',
             'pytest-cov',
         ],
     },
+    entry_points={
+        'console_scripts': ['dotproj_build=builder.__main__:main']
+    }
 )

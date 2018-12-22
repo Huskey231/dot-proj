@@ -1,22 +1,31 @@
 import os
-import json
+import io
 
-with open(os.path.join(os.path.dirname(__file__), 'test.json')) as obj:
-    good_data = obj.read()
+def good_data():
+    with open(os.path.join(os.path.dirname(__file__), 'project.zip'), 'rb') as obj:
+        return io.BytesIO(obj.read())
 
 
-def test_build_empty(client, app):
-    response = client.post('/build/', data='{}',
-                           content_type='application/json')
+def test_build_success(client):
+    response = client.post('/build/', data={'file': (good_data(), 'test.zip')},
+                           follow_redirects=True,
+                           content_type='multipart/form-data')
     assert response.status_code == 200
-    assert 'projects' in response.data.decode('utf-8')
 
-
-def test_build_success(client, app):
-    response = client.post('/build/', data=good_data,
-                           content_type='application/json')
+    response = client.get('/build', follow_redirects=True)
     assert response.status_code == 200
-    respjson = json.loads(response.data.decode('utf-8'))
-    assert 'projects' in respjson
-    for project, dct in respjson['projects'].items():
-        assert 'error' not in dct
+    assert b'Upload new Project' in response.data
+
+
+def test_no_files(client):
+    response = client.post('/build/', data={},
+                           follow_redirects=True,
+                           content_type='multipart/form-data')
+    assert response.status_code == 200
+    assert b'Upload new Project' in response.data
+
+    response = client.post('/build/', data={'file': (good_data(), 'tgz')},
+                           follow_redirects=True,
+                           content_type='multipart/form-data')
+    assert response.status_code == 200
+    assert b'Upload new Project' in response.data
