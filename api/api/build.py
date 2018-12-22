@@ -3,7 +3,7 @@ import io
 import docker
 from docker.errors import ContainerError
 from flask import (
-    Blueprint, request, send_file, redirect, flash
+    Blueprint, request, send_file, redirect
 )
 
 client = docker.from_env()
@@ -25,29 +25,25 @@ def build():
     if request.method == 'POST':
         container = None
         if 'file' not in request.files:
-            flash('No file selected')
             return redirect(request.url)
 
         file = request.files['file']
-        if file.filename == '':
-            flash('No file selected')
+        if not file.filename.endswith('.zip'):
             return redirect(request.url)
         try:
             data = base64.b64encode(file.read()).decode('utf-8')
             status_code, container = run(data)
             stdout = container.logs().decode()
             container.remove()
-            if status_code == 0:
-                btsIO = io.BytesIO()
-                btsIO.write(base64.b64decode(stdout))
-                btsIO.seek(0)
-                outfile = file.filename.split('.', 1)[0]+"-out.zip"
-                return send_file(btsIO,
-                                 attachment_filename=outfile,
-                                 as_attachment=True)
-            else:
-                return stdout, 400
-        except ContainerError as err:
+
+            btsIO = io.BytesIO()
+            btsIO.write(base64.b64decode(stdout))
+            btsIO.seek(0)
+            outfile = file.filename.split('.', 1)[0]+"-out.zip"
+            return send_file(btsIO,
+                             attachment_filename=outfile,
+                             as_attachment=True)
+        except ContainerError as err:  # pragma no cover
             return (container.logs() if container else str(err)), 500
 
     return """<!doctype html>

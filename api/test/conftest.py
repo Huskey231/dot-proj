@@ -1,5 +1,5 @@
 import pytest
-from dot_proj_api import create_app
+from api import create_app
 
 
 @pytest.fixture

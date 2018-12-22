@@ -10,16 +10,21 @@ import json
 
 from subprocess import Popen, PIPE
 
+__all__ = ['make']
+
 
 def make(data):
     source = tempfile.TemporaryDirectory()
-    file_bytes = base64.b64decode(data)
-    file = io.BytesIO(file_bytes)
-    with source as temp_dir:
-        with zipfile.ZipFile(file) as zip_ref:
-            zip_ref.extractall(temp_dir)
+    try:
+        file_bytes = base64.b64decode(data)
+        file = io.BytesIO(file_bytes)
+        with source as temp_dir:
+            with zipfile.ZipFile(file) as zip_ref:
+                zip_ref.extractall(temp_dir)
 
-        return make_build(temp_dir)
+            return make_build(temp_dir)
+    except:
+        return ""
 
 
 def make_build(source_directory):
@@ -54,8 +59,3 @@ def make_dist(request, build_directory):
 
     dist_bytes = distribution.getvalue()
     return base64.b64encode(dist_bytes).decode('utf-8')
-
-
-if __name__ == '__main__':
-    env = os.environ.get('DOT_PROJ_BUILD', '')
-    print(make(env))

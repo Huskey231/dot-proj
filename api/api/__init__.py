@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-from dot_proj_api import build
+from api import build
 
 
 def create_app(test_config=None):
@@ -12,7 +12,7 @@ def create_app(test_config=None):
         SECRET_KEY='dev'
     )
 
-    if test_config is None:
+    if test_config is None:  # pragma no cover
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
     else:
