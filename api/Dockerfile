@@ -9,6 +9,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV FLASK_APP=dot_proj_api
+ENV FLASK_APP=api.app
 
 ENTRYPOINT ["flask", "run"]

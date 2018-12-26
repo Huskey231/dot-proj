@@ -6,7 +6,7 @@ with io.open('README.rst', 'rt', encoding='utf8') as f:
     readme = f.read()
 
 setup(
-    name='dotProj_api',
+    name='api',
     version='0.2.0',
     license='MIT',
     maintainer='Luke Smith',

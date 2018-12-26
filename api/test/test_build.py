@@ -7,7 +7,7 @@ def good_data():
 
 
 def test_build_success(client):
-    response = client.post('/build/', data={'file': (good_data(), 'test.zip')},
+    response = client.post('/build', data={'file': (good_data(), 'test.zip')},
                            follow_redirects=True,
                            content_type='multipart/form-data')
     assert response.status_code == 200
@@ -18,13 +18,13 @@ def test_build_success(client):
 
 
 def test_no_files(client):
-    response = client.post('/build/', data={},
+    response = client.post('/build', data={},
                            follow_redirects=True,
                            content_type='multipart/form-data')
     assert response.status_code == 200
     assert b'Upload new Project' in response.data
 
-    response = client.post('/build/', data={'file': (good_data(), 'tgz')},
+    response = client.post('/build', data={'file': (good_data(), 'tgz')},
                            follow_redirects=True,
                            content_type='multipart/form-data')
     assert response.status_code == 200
